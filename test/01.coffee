@@ -62,18 +62,20 @@ describe "Mongoose pre query", ->
 		User.find {}, (err, results) ->
 			should(err).not.be.ok
 			results.should.be.instanceof(Array).and.have.lengthOf(2)
-			results = results.sort (a, b) -> a.num - b.num
-			results[0].name.should.equal "name2"
-			results[1].name.should.equal "name3"
+			results = results.map (r) -> r.name
+			results.should.containEql("name2")
+			results.should.containEql("name3")
+			results.should.not.containEql("name1")
 			done()
 
 	it "on find query with exec", (done) ->
 		User.find({}).exec (err, results) ->
 			should(err).not.be.ok
 			results.should.be.instanceof(Array).and.have.lengthOf(2)
-			results = results.sort (a, b) -> a.num - b.num
-			results[0].name.should.equal "name2"
-			results[1].name.should.equal "name3"
+			results = results.map (r) -> r.name
+			results.should.containEql("name2")
+			results.should.containEql("name3")
+			results.should.not.containEql("name1")
 			done()
 
 	it "on find query with append where", (done) ->
@@ -169,9 +171,10 @@ describe "Mongoose pre query", ->
 			User.find().withoutpre (err, results) ->
 				should(err).not.be.ok
 				results.should.be.instanceof(Array).and.have.lengthOf(2)
-				results = results.sort (a, b) -> a.num - b.num
-				results[0].name.should.equal "name1"
-				results[1].name.should.equal "name3"
+				results = results.map (r) -> r.name
+				results.should.containEql("name1")
+				results.should.containEql("name3")
+				results.should.not.containEql("name2")
 				done()
 
 	it "on findOneAndRemove with exec", (done) ->
@@ -181,9 +184,10 @@ describe "Mongoose pre query", ->
 			User.find().withoutpre (err, results) ->
 				should(err).not.be.ok
 				results.should.be.instanceof(Array).and.have.lengthOf(2)
-				results = results.sort (a, b) -> a.num - b.num
-				results[0].name.should.equal "name1"
-				results[1].name.should.equal "name3"
+				results = results.map (r) -> r.name
+				results.should.containEql("name1")
+				results.should.containEql("name3")
+				results.should.not.containEql("name2")
 				done()
 
 	it "on findOneAndUpdate", (done) ->
