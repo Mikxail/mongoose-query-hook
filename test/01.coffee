@@ -120,7 +120,12 @@ describe "Mongoose pre query", ->
 				results.should.be.instanceof(Array).and.have.lengthOf(2)
 				for a in results
 					a.num.should.be.equal 99
-				done()
+				User.find({}).withoutpre (err, results) ->
+					should(err).not.be.ok
+					results.should.be.instanceof(Array).and.have.lengthOf(3)
+					count = results.filter (r) -> r.num is 99
+					count.should.have.lengthOf(2)
+					done()
 
 	it "on update with exec", (done) ->
 		User.update({}, {$set: {num: 99}}, {multi: true}).exec (err, count, results) ->

@@ -1,6 +1,10 @@
 mongoose	= require 'mongoose'
 Query		= mongoose.Query
 
+wrap = (fn, wrap) ->
+	->
+		wrap.apply this, [fn].concat(Array::slice.call(arguments))
+
 
 isPathced = false
 pathMongoose = ->
@@ -16,11 +20,9 @@ pathMongoose = ->
 
 	old = {}
 	for act in ['update', 'remove', 'find', 'findOne', 'count', 'distinct', 'findOneAndRemove', 'findOneAndUpdate'] then do (act) ->
-		old[act] = Query::[act]
-		Query::[act] = ->
-			if @_withoutpre or not @model?.schema?._usePreQuery or not @model?.schema?._preQuery or typeof arguments[arguments.length-1] isnt 'function'
-				return old[act].apply @, arguments
-			args = arguments
+		Query::[act] = wrap Query::[act], (origFn, args...) ->
+			if @_withoutpre or not @model?.schema?._usePreQuery or not @model?.schema?._preQuery or typeof args[args.length-1] isnt 'function'
+				return origFn.apply @, args
 
 			if @model?.schema?._usePreQuery and @model.schema._postQuery
 				cb = args[args.length-1]
@@ -37,7 +39,7 @@ pathMongoose = ->
 						return cb(err)
 					else
 						throw err
-				old[act].apply @, args
+				origFn.apply @, args
 			# done
 			, done = (err = null, results = []) =>
 				args[args.length-1].call @, err, results
