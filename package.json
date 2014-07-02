@@ -4,7 +4,7 @@
   "description": "Pre find and post find hooks for mongoose",
   "main": "index.js",
   "dependencies": {
-    "mongoose": "^3.6.20",
+    "mongoose": "~3.6",
     "coffee-script": "*"
   },
   "devDependencies": {
